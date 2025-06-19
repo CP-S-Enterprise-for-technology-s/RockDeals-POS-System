@@ -1,0 +1,288 @@
+import React, { useState } from 'react';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  ShoppingCart, 
+  Users, 
+  Package,
+  DollarSign,
+  Monitor,
+  Gamepad2,
+  Sofa
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+
+const Dashboard = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('Today');
+  const [selectedYear, setSelectedYear] = useState('This year');
+
+  // Sample data for charts
+  const customerHabitsData = [
+    { month: 'Jan', seenProduct: 40000, sales: 35000 },
+    { month: 'Feb', seenProduct: 55000, sales: 45000 },
+    { month: 'Mar', seenProduct: 35000, sales: 30000 },
+    { month: 'Apr', seenProduct: 60000, sales: 50000 },
+    { month: 'May', seenProduct: 45000, sales: 40000 },
+    { month: 'Jun', seenProduct: 55000, sales: 48000 },
+    { month: 'Jul', seenProduct: 40000, sales: 35000 },
+  ];
+
+  const productStatsData = [
+    { name: 'Electronics', value: 2487, color: '#8B5CF6' },
+    { name: 'Games', value: 1828, color: '#EC4899' },
+    { name: 'Furniture', value: 1463, color: '#06B6D4' },
+  ];
+
+  const customerGrowthData = [
+    { country: 'United States', new: 287, returning: 2417, flag: '🇺🇸' },
+    { country: 'Germany', new: 156, returning: 1823, flag: '🇩🇪' },
+    { country: 'Australia', new: 98, returning: 1245, flag: '🇦🇺' },
+    { country: 'France', new: 76, returning: 987, flag: '🇫🇷' },
+  ];
+
+  const StatCard = ({ title, value, change, icon: Icon, isPositive, isPrimary = false }) => (
+    <Card className={`${isPrimary ? 'rockdeals-gradient text-white' : 'bg-card border border-border'}`}>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${isPrimary ? 'bg-white/20' : 'bg-muted'}`}>
+              <Icon className={`w-5 h-5 ${isPrimary ? 'text-white' : 'text-foreground'}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${isPrimary ? 'text-white/80' : 'text-muted-foreground'}`}>
+                {title}
+              </p>
+              <p className={`text-2xl font-bold ${isPrimary ? 'text-white' : 'text-foreground'}`}>
+                {value}
+              </p>
+            </div>
+          </div>
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+            isPositive 
+              ? 'bg-green-500/20 text-green-400' 
+              : 'bg-red-500/20 text-red-400'
+          }`}>
+            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {change}
+          </div>
+        </div>
+        <p className={`text-xs mt-2 ${isPrimary ? 'text-white/60' : 'text-muted-foreground'}`}>
+          Product vs last month
+        </p>
+      </CardContent>
+    </Card>
+  );
+
+  const ProductStatsCard = () => (
+    <Card className="bg-card border border-border">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-lg font-semibold">Product statistics</CardTitle>
+        <Button variant="outline" size="sm" className="text-xs">
+          {selectedPeriod} ▼
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-3xl font-bold">9,829</p>
+            <p className="text-sm text-muted-foreground">Product sales</p>
+            <div className="flex items-center gap-1 mt-1">
+              <TrendingUp className="w-3 h-3 text-green-400" />
+              <span className="text-xs text-green-400 font-medium">+5.43%</span>
+            </div>
+          </div>
+          <div className="w-24 h-24">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={productStatsData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={25}
+                  outerRadius={40}
+                  dataKey="value"
+                >
+                  {productStatsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Monitor className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Electronics</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">2,487</span>
+              <span className="text-xs text-green-400">+1.8%</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gamepad2 className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Games</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">1,828</span>
+              <span className="text-xs text-green-400">+2.8%</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sofa className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Furniture</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">1,463</span>
+              <span className="text-xs text-red-400">-1.04%</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const CustomerHabitsCard = () => (
+    <Card className="bg-card border border-border col-span-2">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-lg font-semibold">Customer Habits</CardTitle>
+          <p className="text-sm text-muted-foreground">Track your customer habbits</p>
+        </div>
+        <Button variant="outline" size="sm" className="text-xs">
+          {selectedYear} ▼
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={customerHabitsData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="month" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px'
+                }}
+              />
+              <Bar dataKey="seenProduct" fill="#8B5CF6" name="Seen Product" />
+              <Bar dataKey="sales" fill="#EC4899" name="Sales" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const CustomerGrowthCard = () => (
+    <Card className="bg-card border border-border">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle className="text-lg font-semibold">Customer Growth</CardTitle>
+          <p className="text-sm text-muted-foreground">Track your customer growth by location</p>
+        </div>
+        <Button variant="outline" size="sm" className="text-xs">
+          Today ▼
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {customerGrowthData.map((country, index) => (
+            <div key={country.country} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">{country.flag}</span>
+                <span className="text-sm font-medium">{country.country}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-sm font-medium">{country.new}</div>
+                  <div className="text-xs text-muted-foreground">New</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-medium">{country.returning}</div>
+                  <div className="text-xs text-muted-foreground">Returning</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6 fade-in">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Total sales"
+          value="$612,917"
+          change="+2.08%"
+          icon={DollarSign}
+          isPositive={true}
+          isPrimary={true}
+        />
+        <StatCard
+          title="Total orders"
+          value="34,760"
+          change="+12.4%"
+          icon={ShoppingCart}
+          isPositive={true}
+        />
+        <StatCard
+          title="Visitors"
+          value="14,987"
+          change="-2.8%"
+          icon={Users}
+          isPositive={false}
+        />
+        <StatCard
+          title="Total sold products"
+          value="12,987"
+          change="+12.1%"
+          icon={Package}
+          isPositive={true}
+        />
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Customer Habits Chart */}
+        <CustomerHabitsCard />
+        
+        {/* Product Statistics */}
+        <ProductStatsCard />
+      </div>
+
+      {/* Customer Growth */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {/* This space can be used for additional charts or content */}
+        </div>
+        <CustomerGrowthCard />
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
+
