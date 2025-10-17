@@ -1,0 +1,107 @@
+# تأكد إنك في جذر المستودع
+cd RockDeals-POS-System
+
+# إنشاء مجلد الـ workflows
+mkdir -p .github/workflows
+
+# إنشاء ملفات الأكشن
+cat > .github/workflows/build.yml <<'EOF'
+name: 🧱 Build & Test
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build all projects
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests (if exist)
+        run: |
+          if [ -d "src/RockDeals.Tests" ]; then
+            dotnet test --no-build --verbosity normal
+          else
+            echo "No tests found, skipping..."
+          fi
+EOF
+
+cat > .github/workflows/release.yml <<'EOF'
+name: 📦 Create Release (Mock)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Publish API & POS
+        run: |
+          dotnet publish src/RockDeals.Api -c Release -o out/api
+          dotnet publish src/RockDeals.POS -c Release -o out/pos
+
+      - name: Compress build
+        run: zip -r build-output.zip out/
+
+      - name: Upload to GitHub (mock release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RockDeals-Build
+          path: build-output.zip
+EOF
+
+cat > .github/workflows/deploy.yml <<'EOF'
+name: 🚀 Mock Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Mock deploy
+        run: |
+          echo "🚀 Starting deployment simulation..."
+          sleep 5
+          echo "✅ API deployed to local environment (simulated)."
+          echo "✅ POS client ready (simulated)."
+          echo "🎉 Deployment completed successfully!"
+EOF
+
+# إضافة الملفات ورفعها إلى GitHub
+git add .github/workflows
+git commit -m "Add full GitHub Actions pipeline (build, release, deploy mock)"
+git push origin main
