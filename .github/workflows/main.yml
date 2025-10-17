@@ -3,7 +3,7 @@ cd RockDeals-POS-System
 
 kdir -p .github/workflows
 
-cat > .github/workflows/build.yml <<'EOF'
+cat > .github/workflows/build.ymal <<'EOF'
 name: Build & Test
 
 on:
