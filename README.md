@@ -190,7 +190,7 @@ npm run dev
 ## التواصل والدعم
 
 - **البريد الإلكتروني**: support@rockdeals.com
-- **الهاتف**: +1-800-ROCKDEALS
+- **الهاتف**: +20 1093741039
 - **الموقع الإلكتروني**: https://www.rockdeals.com
 - **الدعم الفني**: https://support.rockdeals.com
 
@@ -204,5 +204,5 @@ npm run dev
 
 ---
 
-© 2025 RockDeals. جميع الحقوق محفوظة.
+© 2025 RockDeals. Ahmed Hajjaj official جميع الحقوق محفوظة.
 
