@@ -25,27 +25,6 @@ jobs:
         id: gemini
         uses: google-github-actions/run-gemini-cli@v0
         with:
-          gemini-api-key: ${{ secrets.AIzaSyDVtnggUSXwXtp6uKq7ou9V7RQOjV6V6pg }}
+          gemini_api_key: AIzaSyDVtnggUSXwXtp6uKq7ou9V7RQOjV6V6pg
           prompt: |
-            You are an expert software engineer for RockDeals-POS-System.
-            Based on architecture_rules.md and the current repository:
-            1. Fix logic and syntax errors.
-            2. Reorganize files for a professional POS structure.
-            3. Update README.md.
-            Output ONLY a full bash script (mkdir, mv, echo, cat) inside ```bash ... ``` blocks to apply changes.
-
-      - name: Extract and Execute AI Script
-        run: |
-          echo "${{ steps.gemini.outputs.response }}" | grep -Pzo '(?<=```bash\n)[\s\S]*?(?=\n```)' > apply_changes.sh
-          if [ -s apply_changes.sh ]; then
-            chmod +x apply_changes.sh
-            ./apply_changes.sh
-            rm apply_changes.sh
-          fi
-
-      - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "AI Autonomous: Bug fixes and structural improvements"
-          branch: ${{ github.head_ref || github.ref_name }}
-          file_pattern: '*'
+            Analyze the repository, fix any bugs, and optimize the POS system structure.
