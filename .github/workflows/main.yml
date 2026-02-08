@@ -1,46 +1,52 @@
-name: AI Code Review & Quality Bot
+name: AI Autonomous Developer (RockDeals POS)
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
   push:
-    branches: [main, master]
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch: # للتشغيل اليدوي لإعادة هيكلة المشروع
+
+permissions:
+  contents: write  # صلاحية تعديل الأكواد والملفات
+  pull-requests: write
+  issues: write
 
 jobs:
-  review:
+  ai-fixer:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          fetch-depth: 0
 
-      - name: Install dependencies (if any)
-        run: npm install || true
-
-      - name: Run static analysis (eslint, flake8, etc)
-        run: |
-          echo "Running static analysis..."
-          npx eslint . || true
-          find . -name "*.py" -exec flake8 {} + || true
-
-      - name: AI Smart Review
-        env:
-          OPENAI_API_KEY: ${{ secrets.AI_ACCESS_TOKEN }}
-        run: |
-          echo "Starting AI Review..."
-          npx openai api chat.completions.create \
-            -m gpt-5 \
-            -g '{"role":"system","content":"You are a senior software auditor. Review this repository and output a clear markdown report."}' \
-            -g "{\"role\":\"user\",\"content\":\"$(git diff HEAD~1 HEAD)\"}" \
-            > review_report.md
-          echo "AI Review complete."
-
-      - name: Upload AI report
-        uses: actions/upload-artifact@v4
+      - name: Gemini AI - Logic & Fixes
+        id: gemini
+        uses: google-github-actions/run-gemini-cli@v0
         with:
-          name: ai-review-report
-          path: review_report.md
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          # تم توسيع التعليمات لتشمل التعديل الفعلي وهيكلة الملفات
+          prompt: |
+            أنت مهندس برمجيات خبير ومسؤول عن مشروع "RockDeals-POS-System".
+            مهمتك ليست التعليق فقط، بل إجراء تعديلات مباشرة:
+            1. ابحث عن أي أخطاء برمجية في ملفات الـ Python/JavaScript/HTML وقم بإصلاحها.
+            2. قم بتحسين بنية المجلدات (Folder Structure) لتتبع أفضل ممارسات مشاريع الـ POS.
+            3. قم بتحديث ملف README.md ليعكس أي تغييرات في الهيكلية.
+            4. إذا وجدت ملفات ناقصة (مثل .gitignore أو requirements.txt)، قم بإنشائها بمحتوى صحيح.
+            قم بإخراج الكود المصلح بتنسيق واضح ليتم تطبيقه.
+
+      - name: Apply AI Changes
+        run: |
+          # هنا نقوم بتحويل اقتراحات الذكاء الاصطناعي إلى تغييرات فعلية في الملفات
+          git config --global user.name "RockDeals-AI-Bot"
+          git config --global user.email "ai-bot@rockdeals.local"
+          
+          # استدعاء سكربت داخلي لتنفيذ التعديلات (أو كتابتها مباشرة)
+          # ملاحظة: يمكنك إضافة خطوات هنا لتحويل مخرجات Gemini إلى ملفات حقيقية
+          
+      - name: Auto Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "AI: Automated fixes and repository restructuring"
+          branch: ${{ github.head_ref || github.ref_name }}
