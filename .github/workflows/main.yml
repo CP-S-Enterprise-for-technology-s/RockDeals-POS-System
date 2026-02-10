@@ -38,9 +38,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: AI Processing
-        id: gemini
-        uses: google-github-actions/run-ai-chat@v0
+      - name: Run Gemini AI
+        uses: google-github-actions/run-gemini-cli@v0
         with:
           google_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
