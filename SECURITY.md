@@ -1,4 +1,4 @@
-# Security Policy
+## Security Policy
 
 We take the security and integrity of the **RockDeals POS System** extremely seriously. As a Point of Sale application, we understand the critical nature of data protection and operational continuity. This document outlines our security policies, supported versions, and the responsible disclosure procedure for reporting vulnerabilities.
 
@@ -8,7 +8,7 @@ We actively maintain and provide critical security updates for the following ver
 
 | Version | Supported          | Description                                              |
 | ------- | ------------------ | -------------------------------------------------------- |
-| 1.x.x   | :white_check_mark: | Active development, major features, and security patches |
+| [8.3.9](badge.committers.top:white_version_mark:)| :white_check_mark: | Active development, major features, and security patches |
 | < 1.0   | :x:                | Deprecated. No security updates provided                 |
 
 *(Note: The versioning table should be updated as new major versions are released.)*
