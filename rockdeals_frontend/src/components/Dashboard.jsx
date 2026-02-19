@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -28,30 +28,60 @@ import {
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
   const [selectedYear, setSelectedYear] = useState('This year');
+  const [stats, setStats] = useState({
+    total_sales: "$0",
+    total_orders: "0",
+    total_visitors: "0",
+    total_sold_products: "0",
+    sales_change: "0%",
+    orders_change: "0%",
+    visitors_change: "0%",
+    products_change: "0%"
+  });
+  const [customerHabitsData, setCustomerHabitsData] = useState([]);
+  const [productStatsData, setProductStatsData] = useState([]);
+  const [customerGrowthData, setCustomerGrowthData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data for charts
-  const customerHabitsData = [
-    { month: 'Jan', seenProduct: 40000, sales: 35000 },
-    { month: 'Feb', seenProduct: 55000, sales: 45000 },
-    { month: 'Mar', seenProduct: 35000, sales: 30000 },
-    { month: 'Apr', seenProduct: 60000, sales: 50000 },
-    { month: 'May', seenProduct: 45000, sales: 40000 },
-    { month: 'Jun', seenProduct: 55000, sales: 48000 },
-    { month: 'Jul', seenProduct: 40000, sales: 35000 },
-  ];
+  const API_URL = 'http://localhost:5000/api';
 
-  const productStatsData = [
-    { name: 'Electronics', value: 2487, color: '#8B5CF6' },
-    { name: 'Games', value: 1828, color: '#EC4899' },
-    { name: 'Furniture', value: 1463, color: '#06B6D4' },
-  ];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        // Fetch stats
+        const statsRes = await fetch(`${API_URL}/dashboard/stats`);
+        const statsData = await statsRes.json();
+        setStats(statsData);
 
-  const customerGrowthData = [
-    { country: 'United States', new: 287, returning: 2417, flag: '🇺🇸' },
-    { country: 'Germany', new: 156, returning: 1823, flag: '🇩🇪' },
-    { country: 'Australia', new: 98, returning: 1245, flag: '🇦🇺' },
-    { country: 'France', new: 76, returning: 987, flag: '🇫🇷' },
-  ];
+        // Fetch customer habits
+        const habitsRes = await fetch(`${API_URL}/dashboard/customer-habits`);
+        const habitsData = await habitsRes.json();
+        setCustomerHabitsData(habitsData);
+
+        // Fetch product stats
+        const prodRes = await fetch(`${API_URL}/dashboard/product-stats`);
+        const prodData = await prodRes.json();
+        const colors = ['#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#10B981'];
+        setProductStatsData(prodData.categories.map((cat, index) => ({
+          ...cat,
+          color: colors[index % colors.length]
+        })));
+
+        // Fetch customer growth
+        const growthRes = await fetch(`${API_URL}/dashboard/customer-growth`);
+        const growthData = await growthRes.json();
+        setCustomerGrowthData(growthData);
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const StatCard = ({ title, value, change, icon: Icon, isPositive, isPrimary = false }) => (
     <Card className={`${isPrimary ? 'rockdeals-gradient text-white' : 'bg-card border border-border'}`}>
@@ -229,38 +259,42 @@ const Dashboard = () => {
     </Card>
   );
 
+  if (loading) {
+    return <div className="flex items-center justify-center h-full">Loading dashboard data...</div>;
+  }
+
   return (
     <div className="space-y-6 fade-in">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total sales"
-          value="$612,917"
-          change="+2.08%"
+          value={stats.total_sales}
+          change={stats.sales_change}
           icon={DollarSign}
-          isPositive={true}
+          isPositive={stats.sales_change.startsWith('+')}
           isPrimary={true}
         />
         <StatCard
           title="Total orders"
-          value="34,760"
-          change="+12.4%"
+          value={stats.total_orders}
+          change={stats.orders_change}
           icon={ShoppingCart}
-          isPositive={true}
+          isPositive={stats.orders_change.startsWith('+')}
         />
         <StatCard
           title="Visitors"
-          value="14,987"
-          change="-2.8%"
+          value={stats.total_visitors}
+          change={stats.visitors_change}
           icon={Users}
-          isPositive={false}
+          isPositive={stats.visitors_change.startsWith('+')}
         />
         <StatCard
           title="Total sold products"
-          value="12,987"
-          change="+12.1%"
+          value={stats.total_sold_products}
+          change={stats.products_change}
           icon={Package}
-          isPositive={true}
+          isPositive={stats.products_change.startsWith('+')}
         />
       </div>
 

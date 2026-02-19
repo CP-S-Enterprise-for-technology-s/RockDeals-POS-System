@@ -315,6 +315,8 @@ def create_sample_data():
             username='admin',
             email='admin@rockdeals.com',
             password_hash='hashed_password',  # In real app, use proper hashing
+            first_name='Admin',
+            last_name='User',
             role='admin'
         )
         db.session.add(admin_user)
@@ -323,18 +325,18 @@ def create_sample_data():
         
         # Create products
         products = [
-            Product(name='Laptop', description='High-performance laptop', price=999.99, stock_quantity=50, category_id=1, supplier_id=1, barcode='123456789'),
-            Product(name='Gaming Mouse', description='RGB gaming mouse', price=79.99, stock_quantity=100, category_id=1, supplier_id=1, barcode='123456790'),
-            Product(name='Video Game', description='Latest action game', price=59.99, stock_quantity=200, category_id=2, supplier_id=2, barcode='123456791'),
-            Product(name='Office Chair', description='Ergonomic office chair', price=299.99, stock_quantity=30, category_id=3, supplier_id=3, barcode='123456792'),
+            Product(name='Laptop', description='High-performance laptop', sku='LAP001', price=999.99, stock_quantity=50, category_id=1, supplier_id=1, barcode='123456789'),
+            Product(name='Gaming Mouse', description='RGB gaming mouse', sku='MOU001', price=79.99, stock_quantity=100, category_id=1, supplier_id=1, barcode='123456790'),
+            Product(name='Video Game', description='Latest action game', sku='GAM001', price=59.99, stock_quantity=200, category_id=2, supplier_id=2, barcode='123456791'),
+            Product(name='Office Chair', description='Ergonomic office chair', sku='FUR001', price=299.99, stock_quantity=30, category_id=3, supplier_id=3, barcode='123456792'),
         ]
         for product in products:
             db.session.add(product)
         
         # Create customers
         customers = [
-            Customer(name='John Doe', email='john@example.com', phone='123-456-7890', address='123 Main St'),
-            Customer(name='Jane Smith', email='jane@example.com', phone='098-765-4321', address='456 Oak Ave'),
+            Customer(first_name='John', last_name='Doe', email='john@example.com', phone='123-456-7890', address='123 Main St'),
+            Customer(first_name='Jane', last_name='Smith', email='jane@example.com', phone='098-765-4321', address='456 Oak Ave'),
         ]
         for customer in customers:
             db.session.add(customer)
@@ -342,7 +344,14 @@ def create_sample_data():
         db.session.commit()
         
         # Create sample sales
-        sale1 = Sale(customer_id=1, user_id=1, total_amount=1079.98, payment_method='credit_card', status='completed')
+        sale1 = Sale(
+            sale_number='SALE-001',
+            customer_id=1, 
+            user_id=1, 
+            subtotal=1079.98,
+            total_amount=1079.98, 
+            payment_method='credit_card'
+        )
         db.session.add(sale1)
         db.session.flush()
         

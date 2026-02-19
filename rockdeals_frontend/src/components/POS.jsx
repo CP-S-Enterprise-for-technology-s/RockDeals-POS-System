@@ -26,17 +26,30 @@ const POS = () => {
   const [discount, setDiscount] = useState(0);
   const [tax, setTax] = useState(15); // 15% tax
 
-  // Sample products data
+  const API_URL = 'http://localhost:5000/api';
+
+  // Fetch products from backend
   useEffect(() => {
-    const sampleProducts = [
-      { id: 1, name: 'Laptop', price: 999.99, stock: 50, barcode: '123456789', category: 'Electronics' },
-      { id: 2, name: 'Gaming Mouse', price: 79.99, stock: 100, barcode: '123456790', category: 'Electronics' },
-      { id: 3, name: 'Video Game', price: 59.99, stock: 200, barcode: '123456791', category: 'Games' },
-      { id: 4, name: 'Office Chair', price: 299.99, stock: 30, barcode: '123456792', category: 'Furniture' },
-      { id: 5, name: 'Wireless Headphones', price: 149.99, stock: 75, barcode: '123456793', category: 'Electronics' },
-      { id: 6, name: 'Desk Lamp', price: 39.99, stock: 120, barcode: '123456794', category: 'Furniture' },
-    ];
-    setProducts(sampleProducts);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/products`);
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const data = await response.json();
+        // Map backend fields to frontend fields if necessary
+        const mappedProducts = data.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          stock: p.stock_quantity,
+          barcode: p.barcode,
+          category: p.category_name || 'General'
+        }));
+        setProducts(mappedProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
   }, []);
 
   const filteredProducts = products.filter(product =>
@@ -100,7 +113,7 @@ const POS = () => {
     return Math.max(0, paid - total);
   };
 
-  const processSale = () => {
+  const processSale = async () => {
     if (cart.length === 0) {
       alert('Cart is empty!');
       return;
@@ -114,23 +127,50 @@ const POS = () => {
       return;
     }
 
-    // Here you would typically send the sale data to your backend
+    // Prepare data for backend
     const saleData = {
-      items: cart,
-      customer: selectedCustomer,
-      subtotal: calculateSubtotal(),
-      discount: calculateDiscountAmount(),
-      tax: calculateTaxAmount(),
-      total: total,
-      paymentMethod: paymentMethod,
-      amountPaid: paid,
-      change: calculateChange(),
-      timestamp: new Date().toISOString()
+      items: cart.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        unit_price: item.price
+      })),
+      customer_id: selectedCustomer ? selectedCustomer.id : null,
+      total_amount: total,
+      payment_method: paymentMethod,
+      status: 'completed'
     };
 
-    console.log('Processing sale:', saleData);
-    alert('Sale completed successfully!');
-    clearCart();
+    try {
+      const response = await fetch(`${API_URL}/sales`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(saleData),
+      });
+
+      if (!response.ok) throw new Error('Failed to process sale');
+      
+      const result = await response.json();
+      console.log('Sale processed:', result);
+      alert('Sale completed successfully!');
+      clearCart();
+      
+      // Refresh products to update stock
+      const productsResponse = await fetch(`${API_URL}/products`);
+      const productsData = await productsResponse.json();
+      setProducts(productsData.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        stock: p.stock_quantity,
+        barcode: p.barcode,
+        category: p.category_name || 'General'
+      })));
+    } catch (error) {
+      console.error('Error processing sale:', error);
+      alert('Error processing sale. Please try again.');
+    }
   };
 
   const ProductCard = ({ product }) => (
